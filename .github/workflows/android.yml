@@ -1,0 +1,73 @@
+# Gera os dois APKs (equipe e cliente) automaticamente no GitHub, sem precisar instalar o Android Studio.
+# Como usar: envie o projeto para um repositório no GitHub → aba "Actions" → "APKs Android" → "Run workflow".
+# Os APKs ficam para download no fim da execução, em "Artifacts".
+#
+# Opcional (Settings → Secrets and variables → Actions):
+#   SERVER_URL       endereço do servidor embutido no app do CLIENTE (ex.: https://petshop.seudominio.com.br)
+#   KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD   → gera APKs de release assinados (para Play Store)
+name: APKs Android
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '21' }
+      - uses: android-actions/setup-android@v3
+
+      - name: Instalar dependências
+        run: npm ci --ignore-scripts
+        env: { ELECTRON_SKIP_BINARY_DOWNLOAD: '1' }
+
+      - name: Compilar as interfaces
+        run: npm run build:empresa && npm run build:cliente
+        env: { VITE_SERVER_URL: '${{ secrets.SERVER_URL }}' }
+
+      - name: Sincronizar projetos Android
+        run: |
+          (cd mobile/empresa && npx cap sync android)
+          (cd mobile/cliente && npx cap sync android)
+
+      - name: Preparar assinatura (se configurada)
+        if: ${{ env.KS != '' }}
+        env: { KS: '${{ secrets.KEYSTORE_BASE64 }}' }
+        run: echo "$KS" | base64 -d > $RUNNER_TEMP/caramelo.jks
+
+      - name: Gerar APKs
+        env:
+          KS: '${{ secrets.KEYSTORE_BASE64 }}'
+          KS_PASS: '${{ secrets.KEYSTORE_PASSWORD }}'
+          KEY_ALIAS: '${{ secrets.KEY_ALIAS }}'
+          KEY_PASS: '${{ secrets.KEY_PASSWORD }}'
+        run: |
+          mkdir -p apks
+          for app in empresa cliente; do
+            cd mobile/$app/android
+            chmod +x gradlew
+            if [ -n "$KS" ]; then
+              ./gradlew --no-daemon assembleRelease \
+                -Pandroid.injected.signing.store.file=$RUNNER_TEMP/caramelo.jks \
+                -Pandroid.injected.signing.store.password="$KS_PASS" \
+                -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+                -Pandroid.injected.signing.key.password="$KEY_PASS"
+              cp app/build/outputs/apk/release/app-release.apk ../../../apks/caramelo-$app.apk
+            else
+              ./gradlew --no-daemon assembleDebug
+              cp app/build/outputs/apk/debug/app-debug.apk ../../../apks/caramelo-$app.apk
+            fi
+            cd ../../..
+          done
+          ls -la apks
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: caramelo-apks
+          path: apks/*.apk

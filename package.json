@@ -1,0 +1,110 @@
+{
+  "name": "caramelo-molhado-petshop",
+  "productName": "Caramelo Molhado Pet Shop Inc.",
+  "version": "2.0.0",
+  "description": "Sistema de gestão do Caramelo Molhado Pet Shop Inc. — desktop, app da equipe, app do cliente e servidor",
+  "author": "Caramelo Molhado Pet Shop Inc.",
+  "main": "electron/main.js",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
+    "dev:cliente": "vite --config vite.cliente.config.ts",
+    "build:web": "vite build",
+    "build:empresa": "vite build --mode mobile",
+    "build:cliente": "vite build --config vite.cliente.config.ts",
+    "build:all": "npm run build:web && npm run build:empresa && npm run build:cliente",
+    "start": "npm run build:web && npm run build:cliente && electron .",
+    "server": "node server/index.js",
+    "android:assets": "node scripts/make-android-assets.js",
+    "android:sync": "npm run build:empresa && npm run build:cliente && cd mobile/empresa && npx cap sync android && cd ../cliente && npx cap sync android",
+    "apk:empresa": "npm run build:empresa && cd mobile/empresa && npx cap sync android && cd android && ./gradlew assembleDebug",
+    "apk:cliente": "npm run build:cliente && cd mobile/cliente && npx cap sync android && cd android && ./gradlew assembleDebug",
+    "dist": "npm run build:web && npm run build:cliente && electron-builder --win nsis",
+    "dist:portable": "npm run build:web && npm run build:cliente && electron-builder --win portable",
+    "icons": "node scripts/make-icons.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "sql.js": "^1.16.0"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^8.6.2",
+    "@capacitor/browser": "^8.0.5",
+    "@capacitor/cli": "^8.6.2",
+    "@capacitor/core": "^8.6.2",
+    "@capacitor/filesystem": "^8.1.5",
+    "@capacitor/share": "^8.0.3",
+    "@capacitor/status-bar": "^8.0.4",
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "@types/leaflet": "^1.9.22",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "autoprefixer": "^10.6.2",
+    "concurrently": "^10.0.7",
+    "cross-env": "^10.1.0",
+    "electron": "^36.9.5",
+    "electron-builder": "^25.1.8",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^1.72.0",
+    "pe-library": "^2.0.1",
+    "png-to-ico": "^3.0.2",
+    "postcss": "^8.5.32",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "resedit": "^3.1.0",
+    "sharp": "^0.35.5",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21",
+    "wait-on": "^9.5.1",
+    "xlsx": "^0.18.5"
+  },
+  "build": {
+    "appId": "br.com.caramelomolhado.petshop",
+    "productName": "Caramelo Molhado Pet Shop Inc.",
+    "copyright": "Caramelo Molhado Pet Shop Inc.",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-cliente/**/*",
+      "electron/**/*",
+      "server/**/*",
+      "build/icon.png",
+      "package.json"
+    ],
+    "asar": true,
+    "afterPack": "scripts/after-pack.js",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "signAndEditExecutable": false,
+      "artifactName": "Caramelo-Molhado-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Caramelo Molhado Pet Shop",
+      "uninstallDisplayName": "Caramelo Molhado Pet Shop Inc.",
+      "deleteAppDataOnUninstall": false,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "language": "1046",
+      "runAfterFinish": true
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "appId": "br.com.caramelomolhado.cliente",
+  "appName": "Caramelo Molhado",
+  "webDir": "../../dist-cliente",
+  "server": { "androidScheme": "http", "cleartext": true },
+  "android": { "allowMixedContent": true },
+  "plugins": { "StatusBar": { "overlaysWebView": false } }
+}

@@ -1,0 +1,8 @@
+{
+  "appId": "br.com.caramelomolhado.equipe",
+  "appName": "Caramelo Equipe",
+  "webDir": "../../dist-empresa",
+  "server": { "androidScheme": "http", "cleartext": true },
+  "android": { "allowMixedContent": true },
+  "plugins": { "StatusBar": { "overlaysWebView": false } }
+}

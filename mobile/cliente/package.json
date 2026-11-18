@@ -1,0 +1,13 @@
+{
+  "name": "caramelo-cliente-android",
+  "private": true,
+  "description": "Projeto Android (Capacitor). Os pacotes ficam no node_modules da raiz do repositório.",
+  "dependencies": {
+    "@capacitor/android": "8.6.2",
+    "@capacitor/browser": "8.0.5",
+    "@capacitor/core": "8.6.2",
+    "@capacitor/filesystem": "8.1.5",
+    "@capacitor/share": "8.0.3",
+    "@capacitor/status-bar": "8.0.4"
+  }
+}

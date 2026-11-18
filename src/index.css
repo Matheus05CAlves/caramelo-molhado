@@ -1,0 +1,43 @@
+@import '@fontsource-variable/plus-jakarta-sans';
+@import 'leaflet/dist/leaflet.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root { height: 100%; }
+  body { @apply bg-paper font-sans text-ink antialiased; font-feature-settings: 'ss01'; overflow: hidden; user-select: none; }
+  input, textarea, select { user-select: text; }
+  .selectable { user-select: text; }
+  ::selection { background: #FFCFA0; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #D8DBE2; border-radius: 99px; border: 2px solid transparent; background-clip: content-box; }
+  ::-webkit-scrollbar-thumb:hover { background: #BFC4CE; background-clip: content-box; border: 2px solid transparent; }
+  button { cursor: pointer; }
+  button:focus-visible, a:focus-visible { outline: 2px solid #FFB06B; outline-offset: 2px; }
+}
+
+/* mapa */
+.leaflet-container { font-family: inherit; border-radius: 1.5rem; z-index: 0; }
+.leaflet-popup-content-wrapper { border-radius: 1.25rem; padding: 0; box-shadow: 0 18px 40px -16px rgba(42,47,56,.35); }
+.leaflet-popup-content { margin: 0; width: 280px !important; }
+.leaflet-popup-close-button { top: 10px !important; right: 12px !important; }
+.pin { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 6px 14px -4px rgba(0,0,0,.4); border: 3px solid #fff; }
+.pin > span { transform: rotate(45deg); color: #fff; font-weight: 800; font-size: 13px; }
+
+/* celular: grades viram uma coluna, tabelas rolam na horizontal */
+@media (max-width: 767px) {
+  .m-stack { grid-template-columns: minmax(0, 1fr) !important; }
+  .m-stack > * { grid-column: 1 / -1 !important; }
+  .m-two { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .m-two > * { grid-column: auto !important; }
+  .overflow-hidden:has(> table) { overflow-x: auto; }
+  table { min-width: 560px; }
+  .leaflet-popup-content { width: 240px !important; }
+  input, select, textarea { font-size: 16px !important; } /* evita zoom automático ao focar */
+}
+html.native body { -webkit-tap-highlight-color: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
